@@ -6,6 +6,9 @@
   let image = "";
   let description = "";
   let formState ='empty';
+  let createdContacts = [];
+
+  // const initialName = userName
 
   function addContact() {
     if (
@@ -17,7 +20,25 @@
       formState = 'invalid';
       return;
     }
+    createdContacts = [
+      ...createdContacts,
+      {
+      id: Math.random(),
+      name: name, 
+      jobTitle: title, 
+      imageURL: image, 
+      desc: description
+      }
+      ];
     formState = 'done';
+  }
+
+  function deleteFirst() {
+    createdContacts = createdContacts.slice(1);
+  }
+
+  function deleteLast() {
+    createdContacts = createdContacts.slice(0, -1);
   }
 
 </script>
@@ -29,7 +50,7 @@
   }
 </style>
 
-<div id="form">
+<form id="form">
   <div class="form-control">
     <label for="userName">User Name</label>
     <input type="text" bind:value={name} id="userName" />
@@ -46,14 +67,34 @@
     <label for="desc">Description</label>
     <textarea rows="3" bind:value={description} id="desc" />
   </div>
-</div>
+  <button on:click|preventDefault={addContact} type="submit">Add Contact Card</button> 
+</form>
 
-<button on:click={addContact}>Add Contact Card</button> 
+<button on:click={(event) => {
+  createdContacts = createdContacts.slice(1);
+}}> 
+  Delete First 
+</button>
+<button on:click={deleteLast}>Delete Last</button>
 
-{#if formState === 'done'}
-<ContactCard userName={name} jobTitle={title} {description} userImage={image} />
-{:else if formState === 'invalid'}
+<!-- {#if formState =='done'} -->
+  <!-- <ContactCard 
+    userName={createdContact.name} 
+    jobTitle={createdContact.jobTitle} 
+    description={createdContact.desc}
+    userImage={createdContact.imageURL} /> -->
+{#if formState === 'invalid'}
 <p>Invalid Input</p>
 {:else}
   <p>Please enter some data and hit the button!</p>
 {/if}
+{#each createdContacts as contact, i (contact.id)}
+    <h2># {i + 1}</h2>
+  <ContactCard 
+    userName={contact.name} 
+    jobTitle={contact.jobTitle} 
+    description={contact.desc}
+    userImage={contact.imageURL} />
+{:else}
+  <p>Please start adding some contacts, we found none!</p>
+{/each}
